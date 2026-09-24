@@ -1,0 +1,19 @@
+# Copy to terraform.tfvars and adjust. terraform.tfvars is git-ignored.
+
+app_name            = "notesy"
+aws_region          = "us-east-1"
+ecr_repository_name = "notesy"
+image_tag           = "latest" # or a commit SHA already pushed by CI
+
+desired_count = 1
+task_cpu      = 512
+task_memory   = 1024
+
+# Creates the demo/demo user on start-up. Turn off for real environments.
+run_seed = true
+
+# Name (not ARN) of the IAM role behind the AWS_ECR_DEPLOY_ROLE_ARN secret.
+github_deploy_role_name = "github-actions-notesy"
+
+# summarizer_url     = "https://..."
+# summarizer_api_key = "..."   # better: export TF_VAR_summarizer_api_key

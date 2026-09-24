@@ -1,0 +1,44 @@
+name: CI/CD
+
+# PRs: test, typecheck/build the frontend, and build the image (no push).
+# Push to main: all of the above, then build the image once, push it to both
+# ECR and JFrog with the same tags, and roll it out to ECS.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  APP_NAME: notesy
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: notesy
+  # Names created by infra/ (see `terraform output`).
+  ECS_CLUSTER: notesy-cluster
+  ECS_SERVICE: notesy-service
+  ECS_TASK_DEFINITION: notesy
+  ECS_CONTAINER_NAME: notesy
+
+gitleaks:
+    name: Gitleaks Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_COMMENTS: "false"

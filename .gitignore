@@ -1,0 +1,9 @@
+.env
+*.sqlite3
+.sessions/
+node_modules/
+static/js/
+staticfiles/
+__pycache__/
+*.pyc
+.pytest_cache/
